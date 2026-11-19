@@ -1,0 +1,51 @@
+import assert from "node:assert/strict";
+import { cp, mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+import test from "node:test";
+import { runTlc } from "../extensions/tlc.ts";
+import { dotToMermaid } from "../extensions/graph.ts";
+import extension from "../extensions/index.ts";
+import { createMockPi } from "./helpers/mock-pi.ts";
+import { traceToMermaid } from "../extensions/trace-chart.ts";
+
+test("actual TLC checks and renders a model, and reports a violating invariant", { skip: !process.env.GLANCE_TLA2TOOLS_JAR }, async () => {
+  const dir = await mkdtemp(join(tmpdir(), "glance-e2e-"));
+  try {
+    await mkdir(join(dir, ".glance"));
+    await cp(resolve("examples/todo/Spec.tla"), join(dir, ".glance/Spec.tla"));
+    await cp(resolve("examples/todo/Spec.cfg"), join(dir, ".glance/Spec.cfg"));
+    await writeFile(join(dir, ".glance/glossary.md"), "### Todo\n作業を表す対象。\n");
+    const ok = await runTlc(dir, { graph: true });
+    assert.equal(ok.complete, true, ok.text);
+    assert.ok(ok.dot, ok.text);
+    const diagram = dotToMermaid(ok.dot);
+    assert.match(diagram, /inprogress/);
+    assert.match(diagram, /Complete/);
+    const mock = createMockPi();
+    (mock.context as { cwd: string }).cwd = dir;
+    extension(mock.pi);
+    await mock.runCommand("glance", "chart");
+    assert.match(String(mock.messages[0].message.content), /```mermaid/);
+    assert.match(String(mock.messages[0].message.content), /Complete/);
+    assert.match(String(mock.messages[0].message.content), /作業を表す対象/);
+    await mock.runCommand("glance", "chart --by status");
+    assert.match(String(mock.messages[1].message.content), /inprogress/);
+    assert.match(String(mock.messages[1].message.content), /```mermaid/);
+    await writeFile(join(dir, ".glance/Spec.cfg"), 'SPECIFICATION Spec\nINVARIANT NeverDone\n');
+    const { readFile } = await import("node:fs/promises");
+    const path = join(dir, ".glance/Spec.tla");
+    const spec = await readFile(path, "utf8");
+    await writeFile(path, spec.replace("====", 'NeverDone == status # "done"\n===='));
+    const fail = await runTlc(dir, { graph: true });
+    assert.equal(fail.complete, false);
+    assert.match(fail.text, /性質違反/);
+    assert.ok(fail.trace, fail.text);
+    assert.equal(fail.trace.kind, "invariant");
+    assert.equal(fail.trace.property, "NeverDone");
+    assert.match(traceToMermaid(fail.trace), /\[\*\] --> t1/);
+    await mock.runCommand("glance", "check");
+    assert.match(String(mock.messages[2].message.content), /反例の経路/);
+    assert.match(String(mock.messages[2].message.content), /INVARIANT NeverDone/);
+  } finally { await rm(dir, { recursive: true, force: true }); }
+});

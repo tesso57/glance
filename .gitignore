@@ -1,0 +1,4 @@
+/.glance/
+/.local/
+node_modules/
+*.tgz

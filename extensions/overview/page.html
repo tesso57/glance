@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>glance — 構成と状態遷移</title>
+  <style>@@STYLE@@</style>
+</head>
+<body>
+<a class="skip" href="#top">本文へ</a>
+<header class="top"><div class="topinner">
+  <a class="brand" href="#top">glance</a><span id="project" class="repotag"></span>
+  <nav id="nav" aria-label="ページ内"></nav>
+</div></header>
+<main id="top">
+  <div class="intro"><div><h1 id="title"></h1><p id="description"></p></div><div class="revision" id="revision"></div></div>
+  <section id="architecture" aria-labelledby="architecture-title" hidden>
+    <div class="sectionhead"><h2 id="architecture-title">コンポーネントの全体図</h2><div class="controls"><span class="eyetag" id="count"></span><button id="unified" hidden>依存と状態を1枚で見る</button></div></div>
+    <div class="board">
+      <div class="toolbar"><label class="picker">図で探す <select id="components"><option value="">コンポーネントを選択</option></select></label><fieldset class="layers" id="layers"><legend class="sr">表示する接続</legend></fieldset></div>
+      <div class="mapheader"><span id="maphelp">タップで展開 · ドラッグで移動 · ホイール・ピンチで拡大縮小</span><div class="controls">
+        <button id="minus" aria-label="全体図を縮小">−</button><span id="mapzoom" aria-label="表示倍率"></span><button id="plus" aria-label="全体図を拡大">＋</button><button id="fit">全体を収める</button>
+      </div></div>
+      <div id="viewport" class="viewport" tabindex="0" role="region" aria-label="依存関係図" aria-describedby="maphelp"><div id="map"></div></div>
+      <div class="mapfoot"><div class="controls"><span id="mapstats" aria-live="polite"></span><button id="collapse-nodes" hidden>展開をすべて閉じる</button></div><span id="chart-legend" hidden>青いノートを選ぶと状態図が開きます</span><span id="directions"></span></div>
+      <div id="inspector" hidden aria-label="展開したコンポーネントの詳細"></div>
+    </div>
+  </section>
+  <section id="workflows" aria-labelledby="work-title" hidden>
+    <div class="sectionhead"><h2 id="work-title">業務の状態</h2><div class="controls"><button id="unified-states" hidden>状態図を1枚で見る</button><button id="expand" class="small">すべて開く</button></div></div>
+    <div id="cases"></div>
+  </section>
+  <section id="glossary" hidden><div class="sectionhead"><h2>図の用語</h2></div></section>
+  <section id="verification" hidden><div class="sectionhead"><h2>保存された検査結果</h2></div></section>
+  <footer><span id="foot-title"></span><span id="documents"></span></footer>
+</main>
+<dialog id="viewer" aria-labelledby="dialogtitle"><div class="dialoghead">
+  <strong id="dialogtitle"></strong>
+  <label class="jump" hidden>表示位置 <select id="jump"><option value="">全体</option></select></label>
+  <div class="controls" id="figuretools" hidden><button id="fminus" aria-label="図を縮小">−</button><button id="ffit">幅に合わせる</button><button id="fplus" aria-label="図を拡大">＋</button></div>
+  <button id="close" autofocus>閉じる</button></div><div id="dialogbody"></div>
+</dialog>
+<script type="application/json" id="dataset">@@DATA@@</script>
+<script type="module">
+@@APP@@
+</script>
+</body>
+</html>

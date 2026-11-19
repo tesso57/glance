@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "title": "TODO リスト",
+  "description": "TODO を開始してから完了するまで。画面と TODO の関係は設計例です。",
+  "components": [
+    { "id": "list", "label": "TODO 一覧", "group": "画面", "description": "一覧の各 TODO に対して開始と完了を指示する画面。" },
+    { "id": "todo", "label": "TODO", "group": "ドメイン", "description": "一つの TODO の進捗を管理する。" }
+  ],
+  "dependencies": [
+    { "from": "list", "to": "todo", "kind": "runtime", "label": "TODO を開始・完了する" }
+  ],
+  "terms": [
+    { "label": "status", "description": "一つの TODO の進み具合。todo は未着手、inprogress は進行中、done は完了を表す。" }
+  ],
+  "workflows": [
+    {
+      "id": "progress", "label": "TODO の進捗", "components": ["list"],
+      "charts": [
+        { "title": "開始と完了", "file": "status.mmd", "owners": ["todo"], "description": "Start で作業を開始し、Complete で完了する。Done は完了後も同じ状態に留まるモデル上の操作。" }
+      ],
+      "terms": ["status"],
+      "evidence": [
+        { "label": "完了できる状態", "description": "Complete は進行中の TODO を完了にする。", "sources": [{ "file": ".glance/Spec.tla", "line": 7, "label": "Complete の定義" }] }
+      ]
+    }
+  ],
+  "verification": {
+    "summary": "同梱の Spec.cfg で TLC 2.19 が3状態を探索し、TypeOK の違反は報告されなかった。",
+    "scope": "対象は一つの TODO。状態図には status を表示する。",
+    "properties": [{ "label": "TypeOK", "description": "status は todo、inprogress、done のどれかを取る。" }]
+  }
+}

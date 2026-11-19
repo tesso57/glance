@@ -1,0 +1,1 @@
+`input/PublishService.java` の `PublishService.publish` の現在の振る舞いを、`input/MemoryDependencies.java` の `Documents`、`Storage`、`Notifier` を使う場合に絞ってモデル化してください。正常・異常時の状態と結果、再試行時の振る舞いを検討し、TLA+ と図、根拠、対象外の条件を示してください。コードは変更しないでください。
