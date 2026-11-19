@@ -3,7 +3,7 @@ EXTENDS GlanceHistory, TLAPS
 
 Inv == Safety /\ PendingOK
 
-THEOREM HistorySafety == Spec => []Safety
+THEOREM HistoryInvariant == Spec => []Inv
 <1>1. Init => Inv
     BY SMT DEF Init, Inv, Safety, PendingOK, Idle, Attempt, NoFiles
 <1>2. Inv /\ [Next]_vars => Inv'
@@ -38,10 +38,11 @@ THEOREM HistorySafety == Spec => []Safety
         BY DEF Inv, Safety, PendingOK, vars
     <2>6. QED
         BY <2>1, <2>2, <2>3, <2>4, <2>5 DEF Next, FileStages
-<1>3. Inv => Safety
-    BY DEF Inv
-<1>4. QED
-    BY <1>1, <1>2, <1>3, PTL DEF Spec
+<1>3. QED
+    BY <1>1, <1>2, PTL DEF Spec
+
+THEOREM HistorySafety == Spec => []Safety
+    BY HistoryInvariant, PTL DEF Inv
 
 THEOREM HistoryIsAppendOnly == Spec => AppendOnly
 <1>1. [Next]_vars => [published \subseteq published']_vars
